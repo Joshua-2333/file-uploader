@@ -12,17 +12,16 @@ const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const prisma = new PrismaClient();
 const app = express();
 
-/*VIEW ENGINE*/
+/* VIEW ENGINE */
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-/*MIDDLEWARE*/
+/* MIDDLEWARE */
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, "public")));
 
-/*SESSIONS*/
+/* SESSIONS */
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -30,25 +29,26 @@ app.use(
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1 day
     store: new PrismaSessionStore(prisma, {
-      checkPeriod: 2 * 60 * 1000, // clean expired sessions
+      checkPeriod: 2 * 60 * 1000, // clean expired sessions every 2 minutes
+      dbRecordIdIsSessionId: true, // ensures session IDs match DB records
     }),
   })
 );
 
-/*PASSPORT*/
-require("./config/passport")(passport, prisma);
+/* PASSPORT */
+require("./config/passport")(passport);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-/*ROUTES*/
+/* ROUTES */
 app.use("/", require("./routes/index"));
 app.use("/auth", require("./routes/auth"));
 app.use("/folders", require("./routes/folders"));
 app.use("/files", require("./routes/files"));
 
-/*SERVER*/
+/* SERVER */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
