@@ -1,62 +1,68 @@
 // controllers/authController.js
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
 
 module.exports = {
-  // Render login page
-  loginPage: (req, res) => {
-    res.render("login");
+  loginPage(req, res) {
+    res.render("login", { user: req.user });
   },
 
-  // Render register page
-  registerPage: (req, res) => {
-    res.render("register");
+  registerPage(req, res) {
+    res.render("register", { user: req.user });
   },
 
-  // Handle registration
-  register: async (req, res) => {
+  async register(req, res) {
     const { email, password, confirmPassword } = req.body;
 
     if (!email || !password || !confirmPassword) {
-      return res.render("register", { error: "All fields are required" });
+      return res.render("register", {
+        user: null,
+        error: "All fields are required",
+      });
     }
 
     if (password !== confirmPassword) {
-      return res.render("register", { error: "Passwords do not match" });
+      return res.render("register", {
+        user: null,
+        error: "Passwords do not match",
+      });
     }
 
     try {
-      const existingUser = await req.prisma.user.findUnique({ where: { email } });
+      const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
-        return res.render("register", { error: "Email already exists" });
+        return res.render("register", {
+          user: null,
+          error: "Email already exists",
+        });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await req.prisma.user.create({
+      await prisma.user.create({
         data: { email, password: hashedPassword },
       });
 
       res.redirect("/auth/login");
     } catch (err) {
       console.error(err);
-      res.render("register", { error: "Something went wrong" });
+      res.status(500).render("500", { user: null });
     }
   },
 
-  // Handle login
-  login: (req, res, next) => {
+  login(req, res, next) {
     passport.authenticate("local", {
       successRedirect: "/",
       failureRedirect: "/auth/login",
-      failureFlash: true,
     })(req, res, next);
   },
 
-  // Handle logout
-  logout: (req, res) => {
+  logout(req, res, next) {
     req.logout(err => {
-      if (err) console.error(err);
+      if (err) return next(err);
       res.redirect("/auth/login");
     });
   },

@@ -1,0 +1,17 @@
+<!-- ./views/index.ejs -->
+<%- include('layout', { user: user, content: `
+<h2>Your Folders</h2>
+
+<form action="/folders" method="POST">
+  <input type="text" name="name" placeholder="New folder name" required>
+  <button type="submit">Create Folder</button>
+</form>
+
+<ul>
+  ${folders && folders.length > 0 ? folders.map(folder => `
+    <li>
+      <a href="/folders/${folder.id}">📁 ${folder.name} (${folder.files.length} files)</a>
+    </li>
+  `).join('') : '<p>You have no folders yet.</p>'}
+</ul>
+` }) %>

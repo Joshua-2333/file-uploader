@@ -1,0 +1,25 @@
+<!-- ./views/folder.ejs -->
+<%- include('layout', { user: user, content: `
+<h2>Folder: ${folder.name}</h2>
+<a href="/">← Back to Folders</a>
+
+<form action="/files/upload" method="POST" enctype="multipart/form-data">
+  <input type="file" name="file" required>
+  <input type="hidden" name="folderId" value="${folder.id}">
+  <button type="submit">Upload File</button>
+</form>
+
+<ul>
+  ${folder.files && folder.files.length > 0 
+    ? folder.files.map(file => `
+      <li>
+         ${file.name} (${(file.size / 1024).toFixed(2)} KB) 
+        <a href="/files/${file.id}/download">Download</a>
+        <form action="/files/${file.id}/delete" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    `).join('') 
+    : '<p>No files in this folder yet.</p>'}
+</ul>
+` }) %>

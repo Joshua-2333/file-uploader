@@ -1,49 +1,63 @@
 // controllers/folderController.js
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
 module.exports = {
-  // List all folders for logged-in user
-  listFolders: async (req, res) => {
-    const folders = await req.prisma.folder.findMany({
+  async listFolders(req, res) {
+    const folders = await prisma.folder.findMany({
       where: { userId: req.user.id },
+      include: { files: true },
       orderBy: { createdAt: "desc" },
-      include: { files: true },
-    });
-    res.render("index", { folders });
-  },
-
-  // Render folder page with files
-  folderDetails: async (req, res) => {
-    const { id } = req.params;
-    const folder = await req.prisma.folder.findUnique({
-      where: { id: parseInt(id) },
-      include: { files: true },
     });
 
-    if (!folder) return res.status(404).render("404");
-
-    res.render("folder", { folder });
+    res.render("index", {
+      user: req.user,
+      folders,
+    });
   },
 
-  // Create a new folder
-  createFolder: async (req, res) => {
+  async folderDetails(req, res) {
+    const id = parseInt(req.params.id);
+
+    const folder = await prisma.folder.findFirst({
+      where: { id, userId: req.user.id },
+      include: { files: true },
+    });
+
+    if (!folder) {
+      return res.status(404).render("404", { user: req.user });
+    }
+
+    res.render("folder", {
+      user: req.user,
+      folder,
+    });
+  },
+
+  async createFolder(req, res) {
     const { name } = req.body;
     if (!name) return res.redirect("/");
 
-    await req.prisma.folder.create({
-      data: { name, userId: req.user.id },
+    await prisma.folder.create({
+      data: {
+        name,
+        userId: req.user.id,
+      },
     });
 
     res.redirect("/");
   },
 
-  // Delete a folder and its files
-  deleteFolder: async (req, res) => {
-    const { id } = req.params;
+  async deleteFolder(req, res) {
+    const id = parseInt(req.params.id);
 
-    // Delete files inside the folder
-    await req.prisma.file.deleteMany({ where: { folderId: parseInt(id) } });
+    await prisma.file.deleteMany({
+      where: { folderId: id },
+    });
 
-    // Delete the folder
-    await req.prisma.folder.delete({ where: { id: parseInt(id) } });
+    await prisma.folder.delete({
+      where: { id },
+    });
 
     res.redirect("/");
   },

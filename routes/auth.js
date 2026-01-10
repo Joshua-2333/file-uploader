@@ -9,17 +9,20 @@ const prisma = new PrismaClient();
 
 // Register page
 router.get("/register", (req, res) => {
-  res.render("register");
+  res.render("register", { user: req.user });
 });
 
 // Handle registration
 router.post("/register", async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const hashed = await bcrypt.hash(password, 10);
+
     await prisma.user.create({
       data: { email, password: hashed },
     });
+
     res.redirect("/auth/login");
   } catch (err) {
     console.error(err);
@@ -29,7 +32,7 @@ router.post("/register", async (req, res) => {
 
 // Login page
 router.get("/login", (req, res) => {
-  res.render("login");
+  res.render("login", { user: req.user });
 });
 
 // Handle login

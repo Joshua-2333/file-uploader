@@ -12,7 +12,11 @@ router.get("/", ensureAuthenticated, async (req, res) => {
     include: { files: true },
     orderBy: { createdAt: "desc" },
   });
-  res.render("index", { folders, user: req.user });
+
+  res.render("index", {
+    user: req.user,
+    folders,
+  });
 });
 
 module.exports = router;

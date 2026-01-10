@@ -1,0 +1,10 @@
+<!-- ./views/fileDetails.ejs -->
+<%- include('layout', { user: user, content: `
+<h2>File Details: ${file.name}</h2>
+
+<p>Size: ${(file.size / 1024).toFixed(2)} KB</p>
+<p>Uploaded at: ${file.createdAt.toLocaleString()}</p>
+
+<a href="/folders/${file.folderId}">← Back to Folder</a>
+<a href="/files/${file.id}/download">Download</a>
+` }) %>
