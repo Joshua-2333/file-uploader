@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <title>File Uploader</title>
 
+  <!-- Material Symbols for the eye icon -->
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
     rel="stylesheet"
@@ -34,13 +35,7 @@
     <p>&copy; 2026 File Uploader</p>
   </footer>
 
-  <script>
-    document.addEventListener("click", e => {
-      if (e.target.classList.contains("toggle-password")) {
-        const input = e.target.previousElementSibling;
-        input.type = input.type === "password" ? "text" : "password";
-      }
-    });
-  </script>
+  <!-- Include external password JS -->
+  <script src="/js/password.js"></script>
 </body>
 </html>

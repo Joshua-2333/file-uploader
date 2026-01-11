@@ -1,4 +1,4 @@
-/*./public/css/styles.css*/
+/* ./public/css/styles.css */
 /*CSS RESET*/
 *,
 *::before,
@@ -15,8 +15,8 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
     sans-serif;
-  background-color: #0f172a; /* slate-900 */
-  color: #e5e7eb; /* gray-200 */
+  background-color: #0f172a; 
+  color: #e5e7eb; 
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@ body {
 
 /*LAYOUT*/
 header {
-  background-color: #020617; /* slate-950 */
+  background-color: #020617; 
   padding: 1rem 2rem;
   border-bottom: 1px solid #1e293b;
 }
@@ -33,7 +33,7 @@ header {
 header h1 {
   margin: 0;
   font-size: 1.5rem;
-  color: #38bdf8;
+  color: #38bdf8; 
 }
 
 nav {
@@ -89,7 +89,7 @@ p {
   color: #cbd5f5;
 }
 
-/* FORMS */
+/*FORMS*/
 form {
   margin-bottom: 1.5rem;
 }
@@ -111,35 +111,28 @@ input[type="file"] {
   border-radius: 6px;
   color: #e5e7eb;
   font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
 input::placeholder {
   color: #94a3b8;
 }
 
-/* Focus (AA compliant) */
+/* Focus */
 input:focus-visible {
   outline: 2px solid #38bdf8;
   outline-offset: 2px;
 }
 
 /* VALIDATION STATES */
-/* Invalid field (HTML validation) */
-input:invalid {
-  border-color: #f87171;
+input.input-error {
+  border-color: #f87171 !important; /* red for invalid */
 }
 
-/* Invalid & touched */
-input:invalid:focus-visible {
-  outline-color: #f87171;
+input.input-valid {
+  border-color: #22c55e !important; /* green for valid */
 }
 
-/* Valid field */
-input:valid {
-  border-color: #22c55e;
-}
-
-/* Helper text (if added later) */
 .form-error {
   color: #f87171;
   font-size: 0.85rem;
@@ -147,7 +140,7 @@ input:valid {
   margin-bottom: 0.75rem;
 }
 
-/* FILE INPUT*/
+/* FILE INPUT */
 input::file-selector-button {
   background-color: #1e293b;
   border: none;
@@ -179,6 +172,7 @@ input::file-selector-button:hover {
   cursor: pointer;
   color: #cbd5f5;
   font-size: 1.3rem;
+  user-select: none;
 }
 
 .toggle-password:hover,
@@ -196,6 +190,7 @@ button {
   cursor: pointer;
   color: #020617;
   font-size: 1rem;
+  transition: background-color 0.2s;
 }
 
 button:hover {
@@ -207,7 +202,7 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-/* LINKS */
+/*LINKS*/
 a {
   color: #38bdf8;
   text-decoration: none;
@@ -218,7 +213,7 @@ a:focus-visible {
   text-decoration: underline;
 }
 
-/* LISTS (FOLDERS & FILES) */
+/*LISTS (FOLDERS & FILES)*/
 ul {
   list-style: none;
   padding: 0;
@@ -251,13 +246,14 @@ li button {
   color: #ffffff;
   font-size: 0.85rem;
   padding: 0.35rem 0.7rem;
+  transition: background-color 0.2s;
 }
 
 li button:hover {
   background-color: #dc2626;
 }
 
-/* AUTH & ERROR PAGES */
+/*AUTH & ERROR PAGES*/
 .auth-container {
   max-width: 420px;
   margin: 0 auto;
@@ -274,7 +270,7 @@ li button:hover {
 }
 
 /* RESPONSIVE */
-/* Tablet */
+/* Tablets */
 @media (max-width: 900px) {
   main {
     padding: 1.5rem;
