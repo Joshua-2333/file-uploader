@@ -1,62 +1,42 @@
 // controllers/fileController.js
-const path = require("path");
 const fs = require("fs");
-const { PrismaClient } = require("@prisma/client");
+const path = require("path");
 
-const prisma = new PrismaClient();
+exports.upload = (prisma) => async (req, res) => {
+  const folderId = Number(req.body.folderId);
 
-module.exports = {
-  async uploadFile(req, res) {
-    const file = req.file;
-    const folderId = parseInt(req.body.folderId);
+  await prisma.file.create({
+    data: {
+      name: req.file.originalname,
+      size: req.file.size,
+      path: req.file.path,
+      url: `/uploads/${req.file.filename}`,
+      folderId,
+      userId: req.user.id,
+    },
+  });
 
-    if (!file) return res.redirect("back");
+  res.redirect(`/folders/${folderId}`);
+};
 
-    await prisma.file.create({
-      data: {
-        name: file.originalname,
-        size: file.size,
-        path: file.path,
-        url: `/uploads/${file.filename}`,
-        folderId,
-        userId: req.user.id,
-      },
-    });
+exports.download = (prisma) => async (req, res) => {
+  const file = await prisma.file.findFirst({
+    where: { id: Number(req.params.id), userId: req.user.id },
+  });
 
-    res.redirect(`/folders/${folderId}`);
-  },
+  if (!file) return res.status(404).render("404", { user: req.user });
+  res.download(path.resolve(file.path), file.name);
+};
 
-  async downloadFile(req, res) {
-    const id = parseInt(req.params.id);
+exports.delete = (prisma) => async (req, res) => {
+  const file = await prisma.file.findFirst({
+    where: { id: Number(req.params.id), userId: req.user.id },
+  });
 
-    const file = await prisma.file.findFirst({
-      where: { id, userId: req.user.id },
-    });
+  if (!file) return res.status(404).render("404", { user: req.user });
 
-    if (!file) {
-      return res.status(404).render("404", { user: req.user });
-    }
+  if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+  await prisma.file.delete({ where: { id: file.id } });
 
-    res.download(path.resolve(file.path), file.name);
-  },
-
-  async deleteFile(req, res) {
-    const id = parseInt(req.params.id);
-
-    const file = await prisma.file.findFirst({
-      where: { id, userId: req.user.id },
-    });
-
-    if (!file) {
-      return res.status(404).render("404", { user: req.user });
-    }
-
-    if (fs.existsSync(file.path)) {
-      fs.unlinkSync(file.path);
-    }
-
-    await prisma.file.delete({ where: { id } });
-
-    res.redirect("back");
-  },
+  res.redirect("back");
 };

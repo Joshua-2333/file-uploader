@@ -1,22 +1,13 @@
 // ./routes/index.js
 const express = require("express");
-const { ensureAuthenticated } = require("../middleware/auth");
 const { PrismaClient } = require("@prisma/client");
+const { ensureAuthenticated } = require("../middleware/auth");
+const folderController = require("../controllers/folderController");
 
 const prisma = new PrismaClient();
 const router = express.Router();
 
-router.get("/", ensureAuthenticated, async (req, res) => {
-  const folders = await prisma.folder.findMany({
-    where: { userId: req.user.id },
-    include: { files: true },
-    orderBy: { createdAt: "desc" },
-  });
-
-  res.render("index", {
-    user: req.user,
-    folders,
-  });
-});
+router.get("/", ensureAuthenticated, folderController.list(prisma));
+router.post("/folders", ensureAuthenticated, folderController.create(prisma));
 
 module.exports = router;

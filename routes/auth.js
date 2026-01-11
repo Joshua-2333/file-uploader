@@ -1,55 +1,15 @@
 // ./routes/auth.js
 const express = require("express");
-const passport = require("passport");
-const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
+const auth = require("../controllers/authController");
 
-const router = express.Router();
 const prisma = new PrismaClient();
+const router = express.Router();
 
-// Register page
-router.get("/register", (req, res) => {
-  res.render("register", { user: req.user });
-});
-
-// Handle registration
-router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const hashed = await bcrypt.hash(password, 10);
-
-    await prisma.user.create({
-      data: { email, password: hashed },
-    });
-
-    res.redirect("/auth/login");
-  } catch (err) {
-    console.error(err);
-    res.redirect("/auth/register");
-  }
-});
-
-// Login page
-router.get("/login", (req, res) => {
-  res.render("login", { user: req.user });
-});
-
-// Handle login
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/auth/login",
-  })
-);
-
-// Logout
-router.get("/logout", (req, res, next) => {
-  req.logout(err => {
-    if (err) return next(err);
-    res.redirect("/auth/login");
-  });
-});
+router.get("/login", auth.loginPage);
+router.post("/login", auth.login);
+router.get("/register", auth.registerPage);
+router.post("/register", auth.register(prisma));
+router.get("/logout", auth.logout);
 
 module.exports = router;

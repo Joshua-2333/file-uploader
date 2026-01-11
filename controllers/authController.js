@@ -1,69 +1,32 @@
 // controllers/authController.js
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
-const { PrismaClient } = require("@prisma/client");
 
-const prisma = new PrismaClient();
+exports.loginPage = (req, res) =>
+  res.render("login", { user: req.user });
 
-module.exports = {
-  loginPage(req, res) {
-    res.render("login", { user: req.user });
-  },
+exports.registerPage = (req, res) =>
+  res.render("register", { user: req.user });
 
-  registerPage(req, res) {
-    res.render("register", { user: req.user });
-  },
+exports.register = (prisma) => async (req, res) => {
+  const { email, password } = req.body;
+  const hashed = await bcrypt.hash(password, 10);
 
-  async register(req, res) {
-    const { email, password, confirmPassword } = req.body;
-
-    if (!email || !password || !confirmPassword) {
-      return res.render("register", {
-        user: null,
-        error: "All fields are required",
-      });
-    }
-
-    if (password !== confirmPassword) {
-      return res.render("register", {
-        user: null,
-        error: "Passwords do not match",
-      });
-    }
-
-    try {
-      const existingUser = await prisma.user.findUnique({ where: { email } });
-      if (existingUser) {
-        return res.render("register", {
-          user: null,
-          error: "Email already exists",
-        });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      await prisma.user.create({
-        data: { email, password: hashedPassword },
-      });
-
-      res.redirect("/auth/login");
-    } catch (err) {
-      console.error(err);
-      res.status(500).render("500", { user: null });
-    }
-  },
-
-  login(req, res, next) {
-    passport.authenticate("local", {
-      successRedirect: "/",
-      failureRedirect: "/auth/login",
-    })(req, res, next);
-  },
-
-  logout(req, res, next) {
-    req.logout(err => {
-      if (err) return next(err);
-      res.redirect("/auth/login");
+  try {
+    await prisma.user.create({
+      data: { email, password: hashed },
     });
-  },
+    res.redirect("/auth/login");
+  } catch {
+    res.redirect("/auth/register");
+  }
+};
+
+exports.login = passport.authenticate("local", {
+  successRedirect: "/",
+  failureRedirect: "/auth/login",
+});
+
+exports.logout = (req, res, next) => {
+  req.logout(err => (err ? next(err) : res.redirect("/auth/login")));
 };

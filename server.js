@@ -27,17 +27,16 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1 day
+    cookie: { maxAge: 1000 * 60 * 60 * 24 },
     store: new PrismaSessionStore(prisma, {
-      checkPeriod: 2 * 60 * 1000, // clean expired sessions every 2 minutes
-      dbRecordIdIsSessionId: true, // ensures session IDs match DB records
+      checkPeriod: 2 * 60 * 1000,
+      dbRecordIdIsSessionId: true,
     }),
   })
 );
 
 /* PASSPORT */
-require("./config/passport")(passport, prisma); // make sure Prisma is passed
-
+require("./config/passport")(passport, prisma);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -47,19 +46,14 @@ app.use("/auth", require("./routes/auth"));
 app.use("/folders", require("./routes/folders"));
 app.use("/files", require("./routes/files"));
 
-/* 404 ERROR HANDLER */
-app.use((req, res, next) => {
-  res.status(404).render("404");
-});
-
-/* 500 ERROR HANDLER */
+/* ERRORS */
+app.use((req, res) => res.status(404).render("404", { user: req.user }));
 app.use((err, req, res, next) => {
-  console.error(err.stack); // log the error
-  res.status(500).render("500");
+  console.error(err);
+  res.status(500).render("500", { user: req.user });
 });
 
-/* SERVER */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () =>
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
+);
