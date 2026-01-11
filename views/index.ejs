@@ -8,10 +8,20 @@
 </form>
 
 <ul>
-  ${folders && folders.length > 0 ? folders.map(folder => `
-    <li>
-      <a href="/folders/${folder.id}">📁 ${folder.name} (${folder.files.length} files)</a>
-    </li>
-  `).join('') : '<p>You have no folders yet.</p>'}
+  ${
+    folders && folders.length > 0
+      ? folders.map(folder => `
+        <li>
+          <a href="/folders/${folder.id}">
+            📁 ${folder.name} (${folder.files.length} files)
+          </a>
+
+          <form action="/folders/${folder.id}/delete" method="POST">
+            <button type="submit">Delete</button>
+          </form>
+        </li>
+      `).join("")
+      : "<p>You have no folders yet.</p>"
+  }
 </ul>
 ` }) %>

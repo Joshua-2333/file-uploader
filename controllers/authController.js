@@ -10,15 +10,16 @@ exports.registerPage = (req, res) =>
 
 exports.register = (prisma) => async (req, res) => {
   const { email, username, password } = req.body;
+
+  if (!password || password.length < 6) {
+    return res.redirect("/auth/register");
+  }
+
   const hashed = await bcrypt.hash(password, 10);
 
   try {
     await prisma.user.create({
-      data: {
-        email,
-        username,
-        password: hashed,
-      },
+      data: { email, username, password: hashed },
     });
     res.redirect("/auth/login");
   } catch (err) {
