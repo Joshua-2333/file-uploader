@@ -1,9 +1,8 @@
 // ./routes/auth.js
 const express = require("express");
-const { PrismaClient } = require("@prisma/client");
 const auth = require("../controllers/authController");
+const prisma = require("../prisma/client");
 
-const prisma = new PrismaClient();
 const router = express.Router();
 
 router.get("/login", auth.loginPage);

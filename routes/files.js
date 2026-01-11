@@ -1,12 +1,10 @@
 // ./routes/files.js
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
-const { PrismaClient } = require("@prisma/client");
-const { ensureAuthenticated } = require("../middleware/auth");
 const fileController = require("../controllers/fileController");
+const { ensureAuthenticated } = require("../middleware/auth");
+const prisma = require("../prisma/client");
 
-const prisma = new PrismaClient();
 const router = express.Router();
 
 const storage = multer.diskStorage({
@@ -17,7 +15,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post("/upload", ensureAuthenticated, upload.single("file"), fileController.upload(prisma));
+router.post(
+  "/upload",
+  ensureAuthenticated,
+  upload.single("file"),
+  fileController.upload(prisma)
+);
 router.get("/:id/download", ensureAuthenticated, fileController.download(prisma));
 router.post("/:id/delete", ensureAuthenticated, fileController.delete(prisma));
 

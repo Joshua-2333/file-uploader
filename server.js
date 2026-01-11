@@ -6,10 +6,9 @@ const session = require("express-session");
 const passport = require("passport");
 const path = require("path");
 
-const { PrismaClient } = require("@prisma/client");
 const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
+const prisma = require("./prisma/client"); // use centralized Prisma
 
-const prisma = new PrismaClient();
 const app = express();
 
 /* VIEW ENGINE */
@@ -55,5 +54,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
+  console.log(`Server running on http://localhost:${PORT}`)
 );
