@@ -4,19 +4,25 @@ const bcrypt = require("bcryptjs");
 
 module.exports = function (passport, prisma) {
   passport.use(
-    new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
-      try {
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return done(null, false);
+    new LocalStrategy(
+      { usernameField: "email" },
+      async (email, password, done) => {
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email },
+          });
 
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) return done(null, false);
+          if (!user) return done(null, false);
 
-        return done(null, user);
-      } catch (err) {
-        return done(err);
+          const match = await bcrypt.compare(password, user.password);
+          if (!match) return done(null, false);
+
+          return done(null, user);
+        } catch (err) {
+          return done(err);
+        }
       }
-    })
+    )
   );
 
   passport.serializeUser((user, done) => done(null, user.id));

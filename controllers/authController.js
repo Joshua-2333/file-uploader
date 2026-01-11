@@ -9,15 +9,20 @@ exports.registerPage = (req, res) =>
   res.render("register", { user: req.user });
 
 exports.register = (prisma) => async (req, res) => {
-  const { email, password } = req.body;
+  const { email, username, password } = req.body;
   const hashed = await bcrypt.hash(password, 10);
 
   try {
     await prisma.user.create({
-      data: { email, password: hashed },
+      data: {
+        email,
+        username,
+        password: hashed,
+      },
     });
     res.redirect("/auth/login");
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.redirect("/auth/register");
   }
 };
